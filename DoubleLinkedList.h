@@ -16,7 +16,8 @@ namespace LinkedLists {
      *
      * @author Andrey Valitov
      *
-     * @version 1.1 - after rewriting of assignment operators (bug fix)
+     * @version 1.2 - After Google Tests
+     *                Fix iterators methods in the loop in method which compares two lists
      *
      * @tparam T
      */
@@ -102,7 +103,7 @@ namespace LinkedLists {
             };
 
             /**
-             * @brief Comparison between two iterators for inequality
+             * @brief Comparison between two iterators for equality
              *
              * @param other - iterator that this is compared to
              * @return true, if iterators point to the same node
@@ -510,7 +511,6 @@ namespace LinkedLists {
             }
         };
 
-        //Удаляет элементы в интервале [begin, end).
         /**
          *
          * @brief Deletes the elements pointed from begin to end (not include) iterators.
@@ -682,14 +682,14 @@ namespace LinkedLists {
             if (left.size() != right.size()) {
                 return true;
             }
-            Node *curLeft = left.nodePointer_->next;
-            Node *curRight = right.nodePointer_->next;
-            while (curLeft != left.end() && curRight != right.end()) {
-                if (curLeft->data != curRight->data) {
+            auto curItLeft = left.begin();
+            auto curItRight = right.begin();
+            while (curItLeft != left.end() && curItRight != right.end()) {
+                if (*curItLeft != *curItRight) {
                     return true;
                 }
-                curLeft = curLeft->next;
-                curRight = curRight->next;
+                curItLeft++;
+                curItRight++;
             }
             return false;
         };
@@ -706,14 +706,14 @@ namespace LinkedLists {
             if (left.size() != right.size()) {
                 return false;
             }
-            Node *curLeft = left.nodePointer_->next;
-            Node *curRight = right.nodePointer_->next;
-            while (curLeft != left.end() && curRight != right.end()) {
-                if (curLeft->data != curRight->data) {
+            auto curItLeft = left.begin();
+            auto curItRight = right.begin();
+            while (curItLeft != left.end() && curItRight != right.end()) {
+                if (*curItLeft != *curItRight) {
                     return false;
                 }
-                curLeft = curLeft->next;
-                curRight = curRight->next;
+                curItLeft++;
+                curItRight++;
             }
             return true;
         };
