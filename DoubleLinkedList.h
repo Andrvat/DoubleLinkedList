@@ -16,8 +16,10 @@ namespace LinkedLists {
      *
      * @author Andrey Valitov
      *
-     * @version 1.2 - After Google Tests
-     *                Fix iterators methods in the loop in method which compares two lists
+     * @version 1.3 - After Google Tests
+     *                Changed implementations of push back & front methods...
+     *                pop back & front methods
+     *                Added throw in erase when we get the iterator to nonexistent element
      *
      * @tparam T
      */
@@ -42,7 +44,7 @@ namespace LinkedLists {
          * @brief Implements the basic features of the classic non-const iterator from STL
          *        This allows to use an simple way to get and handle list elements
          *
-         * @version 1.0 - before Google tests
+         * @version 1.0 - After Google tests
          */
         class iterator {
         private:
@@ -209,7 +211,7 @@ namespace LinkedLists {
          *
          *        Implementation features are described in the class iterator
          *
-         * @version 1.0 - before Google tests
+         * @version 1.0 - After Google tests
          */
         class const_iterator {
         private:
@@ -345,10 +347,6 @@ namespace LinkedLists {
                 if (!empty()) {
                     clear();
                 }
-                delete nodePointer_;
-                nodePointer_ = new Node();
-                nodePointer_->prev = nodePointer_;
-                nodePointer_->next = nodePointer_;
                 Node *current = other.nodePointer_->next;
                 while (current != other.nodePointer_) {
                     push_back(current->data);
@@ -507,7 +505,7 @@ namespace LinkedLists {
                 delete position.iteratorPointer_;
                 return current;
             } else {
-                return position;
+                throw LinkedLists::LinkedListsException("Can't erase a nonexistent element in erase method");
             }
         };
 
@@ -561,34 +559,14 @@ namespace LinkedLists {
          * @brief Delete the last list element
          */
         void pop_back() {
-            if (empty()) {
-                return;
-            }
-            Node *saveLastNode = nodePointer_->prev;
-
-            nodePointer_->prev = saveLastNode->prev;
-            saveLastNode->prev->next = nodePointer_;
-
-            --doubleLinkedListSize_;
-
-            delete saveLastNode;
+            erase(--end());
         };
 
         /**
          * @brief Delete the first list element
          */
         void pop_front() {
-            if (empty()) {
-                return;
-            }
-            Node *saveFirstNode = nodePointer_->next;
-
-            nodePointer_->next = saveFirstNode->next;
-            saveFirstNode->next->prev = nodePointer_;
-
-            --doubleLinkedListSize_;
-
-            delete saveFirstNode;
+            erase(++begin());
         };
 
         /**
@@ -597,17 +575,7 @@ namespace LinkedLists {
          * @param value - data of new element
          */
         void push_back(const T &value) {
-            Node *newNode = new Node();
-            newNode->data = value;
-            Node *saveLastNode = nodePointer_->prev;
-            nodePointer_->prev = newNode;
-            newNode->next = nodePointer_;
-            newNode->prev = saveLastNode;
-            saveLastNode->next = newNode;
-
-
-            ++doubleLinkedListSize_;
-
+            insert(end(), value);
         };
 
         /**
@@ -616,16 +584,7 @@ namespace LinkedLists {
          * @param value - data of new element
          */
         void push_front(const T &value) {
-            Node *newNode = new Node();
-            newNode->data = value;
-
-            Node *saveFirstNode = nodePointer_->next;
-            nodePointer_->next = newNode;
-            newNode->next = saveFirstNode;
-            newNode->prev = nodePointer_;
-            saveFirstNode->prev = newNode;
-
-            ++doubleLinkedListSize_;
+            insert(begin(), value);
         };
 
         /**
@@ -679,9 +638,14 @@ namespace LinkedLists {
          *         false, if equal
          */
         friend bool operator!=(const DoubleLinkedList &left, const DoubleLinkedList &right) {
+            if (&left == &right) {
+                return false;
+            }
+
             if (left.size() != right.size()) {
                 return true;
             }
+
             auto curItLeft = left.begin();
             auto curItRight = right.begin();
             while (curItLeft != left.end() && curItRight != right.end()) {
@@ -703,19 +667,7 @@ namespace LinkedLists {
          *         false, if not
          */
         friend bool operator==(const DoubleLinkedList &left, const DoubleLinkedList &right) {
-            if (left.size() != right.size()) {
-                return false;
-            }
-            auto curItLeft = left.begin();
-            auto curItRight = right.begin();
-            while (curItLeft != left.end() && curItRight != right.end()) {
-                if (*curItLeft != *curItRight) {
-                    return false;
-                }
-                curItLeft++;
-                curItRight++;
-            }
-            return true;
+            return !(left != right);
         };
 
         /**
