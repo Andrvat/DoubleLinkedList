@@ -16,10 +16,9 @@ namespace LinkedLists {
      *
      * @author Andrey Valitov
      *
-     * @version 1.3 - After Google Tests
-     *                Changed implementations of push back & front methods...
-     *                pop back & front methods
-     *                Added throw in erase when we get the iterator to nonexistent element
+     * @version 1.4 - After Google Tests
+     *                Use friend class methods outside the class by making their global
+     *                Changed output operator by using iterators against nodes
      *
      * @tparam T
      */
@@ -31,6 +30,7 @@ namespace LinkedLists {
             T data;
             Node *prev;
             Node *next;
+
         };
 
         Node *nodePointer_;
@@ -628,83 +628,88 @@ namespace LinkedLists {
 
             return *this;
         };
+    };
 
-        /**
-         * @brief Compares two lists element by element for the inequality
-         *
-         * @param left - first list to compare
-         * @param right - second list to compare
-         * @return true, if the lists are not equal
-         *         false, if equal
-         */
-        friend bool operator!=(const DoubleLinkedList &left, const DoubleLinkedList &right) {
-            if (&left == &right) {
-                return false;
-            }
+    /**
+     * @brief Compares two lists element by element for the inequality
+     *
+     * @param left - first list to compare
+     * @param right - second list to compare
+     * @return true, if the lists are not equal
+     *         false, if equal
+     */
+    template<class T>
+    bool operator!=(const DoubleLinkedList<T> &left, const DoubleLinkedList<T> &right) {
+        if (&left == &right) {
+            return false;
+        }
 
-            if (left.size() != right.size()) {
+        if (left.size() != right.size()) {
+            return true;
+        }
+
+        auto curItLeft = left.begin();
+        auto curItRight = right.begin();
+        while (curItLeft != left.end() && curItRight != right.end()) {
+            if (*curItLeft != *curItRight) {
                 return true;
             }
-
-            auto curItLeft = left.begin();
-            auto curItRight = right.begin();
-            while (curItLeft != left.end() && curItRight != right.end()) {
-                if (*curItLeft != *curItRight) {
-                    return true;
-                }
-                curItLeft++;
-                curItRight++;
-            }
-            return false;
-        };
-
-        /**
-         * @brief Compares two lists element by element for the equality
-         *
-         * @param left - first list to compare
-         * @param right - second list to compare
-         * @return true, if the lists are equal
-         *         false, if not
-         */
-        friend bool operator==(const DoubleLinkedList &left, const DoubleLinkedList &right) {
-            return !(left != right);
-        };
-
-        /**
-         * @brief Outputs the entire list to out using the following template:
-         *        [el_1 <---> el_2 <---> ... <---> el_n]
-         *
-         * @param out - output stream
-         * @param doubleLinkedList - the list for print to the out stream
-         * @return output stream after using
-         */
-        friend std::ostream &operator<<(std::ostream &out, const DoubleLinkedList<T> &doubleLinkedList) {
-            out << "[";
-            Node *currentNode = doubleLinkedList.nodePointer_->next;
-            while (currentNode != doubleLinkedList.nodePointer_) {
-                out << currentNode->data;
-                if (currentNode != doubleLinkedList.nodePointer_->prev) {
-                    out << " <---> ";
-                }
-                currentNode = currentNode->next;
-            }
-            out << "]" << std::endl;
-            return out;
+            curItLeft++;
+            curItRight++;
         }
+        return false;
+    }
 
-        /**
-         * @brief Merges two lists into one
-         *
-         * @param left - first list to join
-         * @param right - second list to join
-         * @return merged list
-         */
-        friend LinkedLists::DoubleLinkedList<T> operator+(const LinkedLists::DoubleLinkedList<T> &left,
-                                                          const LinkedLists::DoubleLinkedList<T> &right) {
-            LinkedLists::DoubleLinkedList<T> list(left);
-            list += right;
-            return list;
+    /**
+     * @brief Compares two lists element by element for the inequality
+     *
+     * @param left - first list to compare
+     * @param right - second list to compare
+     * @return true, if the lists are equal
+     *         false, if not
+     */
+    template<class T>
+    bool operator==(const DoubleLinkedList<T> &left, const DoubleLinkedList<T> &right) {
+        return !(left != right);
+    }
+
+    /**
+     * @brief Outputs the entire list to out using the following template:
+     *        [el_1 <---> el_2 <---> ... <---> el_n]
+     *
+     * @param out - output stream
+     * @param doubleLinkedList - the list for print to the out stream
+     * @return output stream after using
+     */
+    template<class T>
+    std::ostream &operator<<(std::ostream &out, const DoubleLinkedList<T> &doubleLinkedList) {
+        out << "[";
+        auto currentIterator = doubleLinkedList.cbegin();
+        while (currentIterator != doubleLinkedList.cend()) {
+            out << *currentIterator;
+            if (currentIterator != --doubleLinkedList.cend()) {
+                out << " <---> ";
+            }
+            ++currentIterator;
         }
-    };
+        out << "]" << std::endl;
+        return out;
+    }
+
+
+    /**
+     * @brief Merges two lists into one
+     *
+     * @param left - first list to join
+     * @param right - second list to join
+     * @return merged list
+     */
+    template<class T>
+    LinkedLists::DoubleLinkedList<T> operator+(const LinkedLists::DoubleLinkedList<T> &left,
+                                               const LinkedLists::DoubleLinkedList<T> &right) {
+        LinkedLists::DoubleLinkedList<T> list(left);
+        list += right;
+        return list;
+    }
 
 }
