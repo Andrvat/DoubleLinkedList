@@ -16,9 +16,8 @@ namespace LinkedLists {
      *
      * @author Andrey Valitov
      *
-     * @version 1.4 - After Google Tests
-     *                Use friend class methods outside the class by making their global
-     *                Changed output operator by using iterators against nodes
+     * @version 1.4.1 - After Google Tests
+     *                  Fix bug with erase the second element instead the first in method pop_front
      *
      * @tparam T
      */
@@ -566,7 +565,7 @@ namespace LinkedLists {
          * @brief Delete the first list element
          */
         void pop_front() {
-            erase(++begin());
+            erase(begin());
         };
 
         /**
